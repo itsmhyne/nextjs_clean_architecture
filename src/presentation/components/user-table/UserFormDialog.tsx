@@ -14,6 +14,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
+import { ActionResponse } from "@/core/utils/ActionResponse";
 
 export function UserFormDialog() {
   const { isModalOpen, closeModal, selectedUser } = useUserStore();
@@ -27,18 +28,23 @@ export function UserFormDialog() {
     };
 
     try {
+      let response: ActionResponse = {
+        success: false,
+        message: "Terjadi kesalahan yang tidak diketahui.",
+      };
       if (isEdit && selectedUser) {
-        await updateUserAction({ id: selectedUser.id, ...data });
-        toast.success("Berhasil!", {
-          description: "Data pengguna berhasil diperbarui.",
-        });
+        response = await updateUserAction({ id: selectedUser.id, ...data });
       } else {
-        await createUserAction(data);
-        toast.success("Berhasil!", {
-          description: "Pengguna baru berhasil ditambahkan.",
-        });
+        response = await createUserAction(data);
       }
-      closeModal();
+      if (response.success) {
+        // Menggunakan message langsung dari server
+        toast.success("Berhasil!", { description: response.message });
+        closeModal();
+      } else {
+        // Menggunakan message error langsung dari server
+        toast.error("Gagal!", { description: response.message });
+      }
     } catch (err) {
       toast.error("Gagal!", {
         description: "Terjadi kesalahan saat menyimpan data.",

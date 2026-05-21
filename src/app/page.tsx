@@ -3,15 +3,16 @@ import { fetchUsersAction } from "@/presentation/actions/userActions";
 import { UserFormDialog } from "@/presentation/components/user-table/UserFormDialog";
 import { columns } from "@/presentation/components/user-table/columns";
 import { DataTable } from "@/presentation/components/user-table/data-table";
-import { useUserStore } from "@/presentation/store/useUserStore";
 
 export default async function Page({
   searchParams,
 }: {
-  searchParams: { page?: string; q?: string };
+  searchParams: Promise<{ page?: string; q?: string }>;
 }) {
-  const page = Number(searchParams.page) || 1;
-  const query = searchParams.q || "";
+  const resolvedParams = await searchParams;
+
+  const page = Number(resolvedParams.page) || 1;
+  const query = resolvedParams.q || "";
   const limit = 10;
 
   const { data, total } = await fetchUsersAction(page, limit, query);

@@ -23,10 +23,12 @@ const ActionButtons = ({ user }: { user: User }) => {
 
   const handleDelete = async () => {
     try {
-      await deleteUserAction(user.id);
-      toast.success("Berhasil dihapus!", {
-        description: `Data ${user.name} telah dihapus.`,
-      });
+      const response = await deleteUserAction(user.id);
+      if (response.success) {
+        toast.success("Berhasil dihapus!", { description: response.message });
+      } else {
+        toast.error("Gagal!", { description: response.message });
+      }
     } catch (error) {
       toast.error("Gagal!", { description: "Gagal menghapus data pengguna." });
     }
